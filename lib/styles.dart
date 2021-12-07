@@ -154,7 +154,7 @@ class BrandColorsLight {
   static const Color brandGray2 = Color(0xFFEEEEEE);
   static const Color brandGray1 = Color(0xFFF5F5F5);
   static const Color brandGray0 = Color(0xFFFAFAFA);
-  static const Color brandWhite = Color(0xFFFFFFFF);
+  static const Color brandWhite = Color(0xFFFDF5E1);
   static const Color brandBackground = brandWhite;
 }
 

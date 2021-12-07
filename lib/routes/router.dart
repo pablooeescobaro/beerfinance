@@ -1,5 +1,5 @@
 import 'package:auto_route/annotations.dart';
-import 'package:beer_app/screens/home_page.dart';
+import 'package:beer_app/screens/home/home_page.dart';
 
 @MaterialAutoRouter(
   replaceInRouteName: 'Page,Route',

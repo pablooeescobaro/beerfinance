@@ -38,9 +38,9 @@ class MyThemes {
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
               statusBarColor: Colors.transparent,
-              systemNavigationBarColor: BrandColorsLight.brandWhite,
+              systemNavigationBarColor: BrandColorsLight.brandBlack,
               systemNavigationBarIconBrightness: Brightness.dark),
-          color: BrandColorsLight.brandWhite,
+          color: BrandColorsLight.brandBlack,
           iconTheme: const IconThemeData(
             color: BC.brandBlue,
           )),
@@ -55,11 +55,11 @@ class MyThemes {
           unselectedLabelColor: BC.brandError),
       toggleableActiveColor: BC.brandAccentGreen1,
       primarySwatch: BC.colorPrimary,
-      scaffoldBackgroundColor: BrandColorsLight.brandWhite,
+      scaffoldBackgroundColor: BrandColorsLight.brandBlack,
       textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: BC.brandAccentGreen1,
-        selectionHandleColor: BC.brandAccentGreen1,
-        selectionColor: BC.brandAccentGreen2,
+        cursorColor: BC.brandYellow,
+        selectionHandleColor: BC.brandYellow,
+        selectionColor: BC.brandYellow,
       ),
       dividerTheme: const DividerThemeData(color: BrandColorsLight.brandGray0, space: 1),
       checkboxTheme: CheckboxThemeData(
@@ -74,10 +74,10 @@ class MyThemes {
         }),
       ),
       primaryColor: BC.brandPrimary,
-      backgroundColor: BrandColorsLight.brandWhite,
+      backgroundColor: BrandColorsLight.brandBlack,
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         // backgroundColor: BrandColors.brandAccent,
-          foregroundColor: BrandColorsLight.brandWhite),
+          foregroundColor: BrandColorsLight.brandBlack),
       /////NEW
       inputDecorationTheme: InputDecorationTheme(
         enabledBorder: OutlineInputBorder(
