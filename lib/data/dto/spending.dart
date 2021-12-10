@@ -1,4 +1,5 @@
 import 'package:beer_app/data/dto/finance.dart';
+import 'package:beer_app/styles.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'spending.g.dart';
@@ -11,6 +12,22 @@ enum SpendingCategoryEnum {
   OTHER
 }
 
+List spendingNames = [
+  'Продукты',
+  'Развлечения',
+  'Транспорт',
+  'Товары для дома',
+  'Другое',
+];
+
+List spendingColors = [
+  BC.spending1,
+  BC.spending2,
+  BC.spending3,
+  BC.spending4,
+  BC.spending5,
+];
+
 final SpendingCategoryEnumMap = {
   'Продукты': SpendingCategoryEnum.PRODUCTS,
   'Развлечения': SpendingCategoryEnum.ENTERTAINMENT,
@@ -19,10 +36,18 @@ final SpendingCategoryEnumMap = {
   'Другое': SpendingCategoryEnum.OTHER,
 };
 
+final SpendingCategoryEnumReverse = {
+  SpendingCategoryEnum.PRODUCTS: 'Продукты',
+  SpendingCategoryEnum.ENTERTAINMENT: 'Развлечения',
+  SpendingCategoryEnum.TRANSPORT: 'Транспорт',
+  SpendingCategoryEnum.HOMEPRODUCTS: 'Товары для дома',
+  SpendingCategoryEnum.OTHER: 'Другое',
+};
+
 @JsonSerializable()
 class SpendingModel {
   String? id;
-  int? amount;
+  double? amount;
   String? name;
   SpendingCategoryEnum? category;
   FinanceTypeEnum? type;
@@ -47,4 +72,21 @@ class ListSpending {
       _$ListSpendingFromJson(json);
 
   Map<String, dynamic> toJson() => _$ListSpendingToJson(this);
+
+  ListFinance toFinanceList(ListSpending? listSpending) {
+    final list = <FinanceModel>[];
+    if (listSpending != null && listSpending.data != null) {
+      for (var e in listSpending.data ?? []) {
+        list.add(FinanceModel(
+            id: e.id,
+            name: e.name,
+            type: e.type,
+            amount: e.amount,
+            date: e.date));
+      }
+      return ListFinance(data: list);
+    } else {
+      return ListFinance();
+    }
+  }
 }

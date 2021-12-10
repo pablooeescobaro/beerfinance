@@ -1,17 +1,18 @@
 import 'package:beer_app/data/dto/finance.dart';
-import 'package:beer_app/data/dto/income.dart';
-import 'package:beer_app/data/dto/saving.dart';
-import 'package:beer_app/data/dto/spending.dart';
+import 'package:beer_app/screens/home/home_main_activity.dart';
+import 'package:beer_app/screens/home/home_main_information.dart';
 import 'package:beer_app/styles.dart';
+import 'package:beer_app/widget/action_handler.dart';
 import 'package:beer_app/widget/bottom_sheet_border.dart';
-import 'package:beer_app/widget/buttom.dart';
+import 'package:beer_app/widget/button.dart';
 import 'package:beer_app/widget/dropdown_button.dart';
+import 'package:beer_app/widget/page_error_handler.dart';
 import 'package:beer_app/widget/progress_indicator.dart';
 import 'package:beer_app/widget/text_field.dart';
 import 'package:beer_app/widget/title.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'home_bloc.dart';
 
@@ -27,6 +28,8 @@ HomeBloc _bloc = HomeBloc();
 class _HomePageState extends State<HomePage> {
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerPrice = TextEditingController();
+  final FocusNode _focusName = FocusNode();
+  final FocusNode _focusPrice = FocusNode();
 
   @override
   void initState() {
@@ -38,6 +41,8 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _controllerName.dispose();
     _controllerPrice.dispose();
+    _focusPrice.dispose();
+    _focusName.dispose();
     super.dispose();
   }
 
@@ -66,63 +71,70 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _body(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _mainInformation(context),
-        _mainActivity(context),
-        _mainButton(context),
-      ],
-    );
-  }
-
-  Widget _mainInformation(BuildContext context) {
-    return Container();
-  }
-
-  Widget _mainActivity(BuildContext context) {
-    return StreamBuilder<ScreenState>(
-        stream: _bloc.state,
-        initialData: _bloc.currentState,
-        builder: (context, snapshot) {
-          final state = snapshot.data;
-          if (state != null &&
-              state.finances != null &&
-              state.incomes != null &&
-              state.savings != null &&
-              state.spending != null) {
-            return Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _circularChart(
-                      context,
-                      state.incomes?.data ?? <IncomeModel>[],
-                      state.savings?.data ?? <SavingModel>[],
-                      state.spending?.data ?? <SpendingModel>[],
+    return ActionHandler(
+      stream: _bloc.actions,
+      handler: _handleAction,
+      child: StreamBuilder<ScreenState>(
+          stream: _bloc.state,
+          initialData: _bloc.currentState,
+          builder: (context, snapshot) {
+            final state = snapshot.data;
+            if (state != null &&
+                state.finances != null &&
+                state.incomes != null &&
+                state.savings != null &&
+                state.spending != null) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Wrap(
+                        children: [
+                          HomeMainInformation(
+                              allFinance: state.allFinance ??
+                                  AllFinanceModel(
+                                    allSavings: 0,
+                                    allSpending: 0,
+                                    allIncome: 0,
+                                  ),
+                              bloc: _bloc),
+                          HomeMainActivity(state: state, bloc: _bloc),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return Center(
-              child: CustomProgressIndicator(),
-            );
-          }
-        });
+                  ),
+                  _mainButton(context),
+                ],
+              );
+            } else {
+              return Center(
+                child: CustomProgressIndicator(),
+              );
+            }
+          }),
+    );
   }
 
   Widget _mainButton(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 40,
+      decoration: BoxDecoration(
+          color: BC.brandBlack,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          )),
+      padding: EdgeInsets.only(bottom: 4, top: 4),
+      height: 58,
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CustomButton(
             text: 'ВНЕСТИ ДОХОД',
-            width: MediaQuery.of(context).size.width / 3 - 2,
+            width: MediaQuery.of(context).size.width / 3 - 8,
             onTap: () => _showAddIncome(context),
             margin: 1,
           ),
@@ -134,7 +146,7 @@ class _HomePageState extends State<HomePage> {
           ),
           CustomButton(
             text: 'ВНЕСТИ ТРАТУ',
-            width: MediaQuery.of(context).size.width / 3 - 2,
+            width: MediaQuery.of(context).size.width / 3 - 8,
             onTap: () => _showAddSpending(context),
             margin: 1,
           ),
@@ -168,13 +180,26 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 34),
                           CustomTextField(
                             hintText: 'Описание',
+                            errText: state.hasName ? null : 'Введите описание',
                             controller: _controllerPrice,
+                            textInputAction: TextInputAction.next,
+                            focus: _focusName,
+                            onFieldSubmitted: () => {
+                              _focusName.unfocus(),
+                              FocusScope.of(context).requestFocus(_focusPrice),
+                            },
                           ),
                           const SizedBox(height: 8),
                           CustomTextField(
                             hintText: 'Сумма',
+                            errText: state.hasName ? null : 'Введите сумму',
                             controller: _controllerName,
                             type: TextInputType.number,
+                            focus: _focusPrice,
+                            inputFormatter: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+(\.|\,)?(\d{1,2}|\d{3})?'))
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -201,7 +226,6 @@ class _HomePageState extends State<HomePage> {
                                 onTap: () {
                                   _bloc.addIncome(context, _controllerName.text,
                                       _controllerPrice.text);
-                                  _clearInputs();
                                 },
                               ),
                             ],
@@ -240,13 +264,30 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 34),
                           CustomTextField(
                             hintText: 'Описание',
+                            errText: state.hasName ? null : 'Введите описание',
                             controller: _controllerPrice,
+                            textInputAction: TextInputAction.next,
+                            focus: _focusName,
+                            onFieldSubmitted: () => {
+                              _focusName.unfocus(),
+                              FocusScope.of(context).requestFocus(_focusPrice),
+                            },
                           ),
                           const SizedBox(height: 8),
                           CustomTextField(
                             hintText: 'Сумма',
+                            errText: state.hasName ? null : 'Введите сумму',
                             controller: _controllerName,
                             type: TextInputType.number,
+                            focus: _focusPrice,
+                            onFieldSubmitted: () => {
+                              _bloc.addSaving(context, _controllerName.text,
+                                  _controllerPrice.text),
+                            },
+                            inputFormatter: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+(\.|\,)?(\d{1,2}|\d{3})?')),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           CustomButton(
@@ -257,7 +298,6 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               _bloc.addSaving(context, _controllerName.text,
                                   _controllerPrice.text);
-                              _clearInputs();
                             },
                           )
                         ],
@@ -294,13 +334,26 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 34),
                           CustomTextField(
                             hintText: 'Описание',
+                            errText: state.hasName ? null : 'Введите описание',
                             controller: _controllerPrice,
+                            textInputAction: TextInputAction.next,
+                            focus: _focusName,
+                            onFieldSubmitted: () => {
+                              _focusName.unfocus(),
+                              FocusScope.of(context).requestFocus(_focusPrice),
+                            },
                           ),
                           const SizedBox(height: 8),
                           CustomTextField(
                             hintText: 'Сумма',
+                            errText: state.hasName ? null : 'Введите сумму',
                             controller: _controllerName,
                             type: TextInputType.number,
+                            focus: _focusPrice,
+                            inputFormatter: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+(\.|\,)?(\d{1,2}|\d{3})?')),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Row(
@@ -332,7 +385,6 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       _controllerName.text,
                                       _controllerPrice.text);
-                                  _clearInputs();
                                 },
                               ),
                             ],
@@ -351,31 +403,11 @@ class _HomePageState extends State<HomePage> {
     _controllerPrice.text = '';
   }
 
-  _circularChart(
-    BuildContext context,
-    List<IncomeModel> incomes,
-    List<SavingModel> savings,
-    List<SpendingModel> spending,
-  ) {
-    final data = _bloc.prepareDateForChart(incomes, savings, spending);
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SfCircularChart(series: <CircularSeries>[
-          DoughnutSeries<ChartData, String>(
-              dataSource: data,
-              xValueMapper: (ChartData data, _) => data.x,
-              yValueMapper: (ChartData data, _) => data.y,
-              pointColorMapper: (ChartData data, _) => data.color,
-              // Radius of doughnut
-              radius: '100%')
-        ]),
-        Text(
-          _bloc.parsePercent(data),
-          style: BS.reg18.apply(color: BC.brandYellow),
-        ),
-      ],
-    );
+  void _handleAction(ActionEvent event, BuildContext context) {
+    if (event.isShowErrorAction) {
+      PageErrorHandler.showGenericError(context,
+          errorMessage: 'Невозожно внести расход, измините лимит.');
+    }
   }
 }
 

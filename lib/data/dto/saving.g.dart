@@ -8,7 +8,7 @@ part of 'saving.dart';
 
 SavingModel _$SavingModelFromJson(Map<String, dynamic> json) => SavingModel(
       id: json['id'] as String?,
-      amount: json['amount'] as int?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       type: $enumDecodeNullable(_$FinanceTypeEnumEnumMap, json['type']),
       date: json['date'] as int?,

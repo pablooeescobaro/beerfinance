@@ -9,7 +9,7 @@ part of 'spending.dart';
 SpendingModel _$SpendingModelFromJson(Map<String, dynamic> json) =>
     SpendingModel(
       id: json['id'] as String?,
-      amount: json['amount'] as int?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       category:
           $enumDecodeNullable(_$SpendingCategoryEnumEnumMap, json['category']),

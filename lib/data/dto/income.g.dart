@@ -8,7 +8,7 @@ part of 'income.dart';
 
 IncomeModel _$IncomeModelFromJson(Map<String, dynamic> json) => IncomeModel(
       id: json['id'] as String?,
-      amount: json['amount'] as int?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       category:
           $enumDecodeNullable(_$IncomeCategoryEnumEnumMap, json['category']),

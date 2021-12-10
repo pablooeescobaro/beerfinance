@@ -27,11 +27,20 @@ class IncomeApi {
     return IncomeModel.fromJson(jsonDecode(result ?? ''));
   }
 
+  Future<void> deleteIncome(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final result = await prefs.remove(id);
+    final list = prefs.getString('incomes');
+    final listIncome = ListIncome.fromJson(jsonDecode(list!));
+    listIncome.data!.removeWhere((element) => element.id == id);
+    await prefs.setString('incomes', jsonEncode(listIncome));
+  }
+
   Future<ListIncome> getIncomes() async {
     final prefs = await SharedPreferences.getInstance();
     final result = prefs.getString('incomes');
 
-    if(result != null){
+    if (result != null) {
       return ListIncome.fromJson(jsonDecode(result));
     } else {
       return ListIncome();
@@ -40,21 +49,25 @@ class IncomeApi {
 
   Future<List<FinanceModel>> getFinanceList() async {
     final prefs = await SharedPreferences.getInstance();
-    final result =
-        ListIncome.fromJson(jsonDecode(prefs.getString('incomes') ?? '')).data;
+    final response = prefs.getString('incomes') ?? '';
 
     final List<FinanceModel> finances = [];
-    if (result != null) {
-      for (var i = 0; result.length > i; i++) {
-        final e = result[i];
-        finances.add(FinanceModel(
-            id: e.id,
-            date: e.date,
-            amount: e.amount,
-            type: e.type,
-            name: e.name));
+    if (response != '') {
+      final result = ListIncome.fromJson(jsonDecode(response)).data;
+      if (result != null) {
+        for (var i = 0; result.length > i; i++) {
+          final e = result[i];
+          finances.add(FinanceModel(
+              id: e.id,
+              date: e.date,
+              amount: e.amount,
+              type: e.type,
+              name: e.name));
+        }
+        return finances;
+      } else {
+        return <FinanceModel>[];
       }
-      return finances;
     } else {
       return <FinanceModel>[];
     }

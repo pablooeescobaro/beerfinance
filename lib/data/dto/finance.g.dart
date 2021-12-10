@@ -8,7 +8,7 @@ part of 'finance.dart';
 
 FinanceModel _$FinanceModelFromJson(Map<String, dynamic> json) => FinanceModel(
       id: json['id'] as String?,
-      amount: json['amount'] as int?,
+      amount: (json['amount'] as num?)?.toDouble(),
       name: json['name'] as String?,
       type: $enumDecodeNullable(_$FinanceTypeEnumEnumMap, json['type']),
       date: json['date'] as int?,
@@ -38,4 +38,18 @@ ListFinance _$ListFinanceFromJson(Map<String, dynamic> json) => ListFinance(
 Map<String, dynamic> _$ListFinanceToJson(ListFinance instance) =>
     <String, dynamic>{
       'data': instance.data,
+    };
+
+AllFinanceModel _$AllFinanceModelFromJson(Map<String, dynamic> json) =>
+    AllFinanceModel(
+      allIncome: (json['allIncome'] as num?)?.toDouble() ?? 0,
+      allSpending: (json['allSpending'] as num?)?.toDouble() ?? 0,
+      allSavings: (json['allSavings'] as num?)?.toDouble() ?? 0,
+    );
+
+Map<String, dynamic> _$AllFinanceModelToJson(AllFinanceModel instance) =>
+    <String, dynamic>{
+      'allIncome': instance.allIncome,
+      'allSpending': instance.allSpending,
+      'allSavings': instance.allSavings,
     };

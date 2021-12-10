@@ -68,6 +68,11 @@ class BC {
   static const Color brandAccentGreen1 = Color(0xFF52B02B);
   static const Color brandAccentGreen2 = Color(0xFF98DB7C);
   static const Color brandYellow = Color(0xFFF18F01);
+  static const Color spending1 = Color(0xFF1E3888);
+  static const Color spending2 = Color(0xFF47A8BD);
+  static const Color spending3 = Color(0xFFF5E663);
+  static const Color spending4 = Color(0xFF30734C);
+  static const Color spending5 = Color(0xFFEA7AF4);
 
   static Color get brandWhite => ThemeProvider.isThemeDark
       ? BrandColorsDark.brandWhite

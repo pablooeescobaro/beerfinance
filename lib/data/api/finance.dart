@@ -18,6 +18,8 @@ class FinanceApi {
     finances.addAll(saving);
     finances.addAll(spending);
 
+    finances.sort((a, b) => (a.date ?? 0) < (b.date ?? 0) ? 1 : -1);
+
     return ListFinance(data: finances);
   }
 }

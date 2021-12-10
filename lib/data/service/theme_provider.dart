@@ -32,7 +32,7 @@ class MyThemes {
   );
 
   static final lightTheme = ThemeData(
-      fontFamily: 'Beer',
+      fontFamily: 'Rubik',
       brightness: Brightness.light,
       appBarTheme: AppBarTheme(
           elevation: 0,
@@ -68,12 +68,12 @@ class MyThemes {
             return BrandColorsLight.brandGray4;
           }
           if (states.contains(MaterialState.selected)) {
-            return BC.brandPrimary;
+            return BC.brandYellow;
           }
           return BrandColorsLight.brandGray4;
         }),
       ),
-      primaryColor: BC.brandPrimary,
+      primaryColor: BC.brandYellow,
       backgroundColor: BrandColorsLight.brandBlack,
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         // backgroundColor: BrandColors.brandAccent,
